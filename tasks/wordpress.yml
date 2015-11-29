@@ -39,16 +39,6 @@
     owner: "{{ wordpress_user }}"
     group: www-data
     mode: "ug=rwX,o=" # X != x, remember
-- name: Ensure Wordpress contents' permissions
-  file:
-    path: "{{ wordpress_project_root}}/{{ item }}"
-    mode: "ug=rwX,o=" # X != x, remember
-    owner: "{{ wordpress_user }}"
-    group: www-data
-    recurse: yes
-  with_items:
-    - themes
-    - plugins
 - name: Is Wordpress downloaded?
   stat: "path={{ wordpress_site_root }}"
   register: wordpress_stat
