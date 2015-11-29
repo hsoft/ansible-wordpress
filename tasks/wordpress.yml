@@ -1,0 +1,129 @@
+---
+- name: Ensure that wp-cli is installed
+  get_url: "url={{ wpcli_url }} dest={{ wpcli_binpath }}"
+  register: wpcli_download
+- name: Ensure that wp-cli bin has proper permissions
+  file:
+    path: "{{ wpcli_binpath }}"
+    mode: "0755"
+  when: wpcli_download|changed
+- name: Ensure that Wordpress' project dir exists
+  file:
+    path: "{{ wordpress_project_root }}"
+    state: directory
+    owner: "{{ wordpress_user }}"
+    group: www-data
+    mode: "2750" # leading 2 = setguid for the folder to propagate www-data group
+- name: Sync local themes
+  include: srcsync.yml
+  vars:
+    sync_base_target: "{{ wordpress_project_root }}/themes"
+    sync_paths: "{{ wordpress_local_themes }}"
+- name: Sync local plugins
+  include: srcsync.yml
+  vars:
+    sync_base_target: "{{ wordpress_project_root }}/plugins"
+    sync_paths: "{{ wordpress_local_plugins }}"
+- name: Ensure that Wordpress uploads folder exists
+  file:
+    path: "{{ wordpress_project_root }}/uploads"
+    state: directory
+    owner: "{{ wordpress_user }}"
+    group: www-data
+    mode: "ug=rwX,o=" # X != x, remember
+- name: Copy Wordpress uploads over
+  unarchive:
+    src: uploads.tar.gz
+    dest: "{{ wordpress_project_root }}/uploads"
+    creates: "{{ wordpress_project_root }}/uploads/2015"
+    owner: "{{ wordpress_user }}"
+    group: www-data
+    mode: "ug=rwX,o=" # X != x, remember
+- name: Ensure Wordpress contents' permissions
+  file:
+    path: "{{ wordpress_project_root}}/{{ item }}"
+    mode: "ug=rwX,o=" # X != x, remember
+    owner: "{{ wordpress_user }}"
+    group: www-data
+    recurse: yes
+  with_items:
+    - themes
+    - plugins
+- name: Is Wordpress downloaded?
+  stat: "path={{ wordpress_site_root }}"
+  register: wordpress_stat
+- name: Download wordpress
+  shell: "wp core download --path={{ wordpress_site_root }} --locale=fr_FR"
+  when: "not wordpress_stat.stat.exists"
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Make theme symlinks
+  file:
+    path: "{{ wordpress_site_root }}/wp-content/themes/{{ item | basename }}"
+    src: "{{ wordpress_project_root }}/themes/{{ item | basename }}"
+    state: link
+  with_items: wordpress_local_themes
+- name: Make local plugins symlinks
+  file:
+    path: "{{ wordpress_site_root }}/wp-content/plugins/{{ item | basename }}"
+    src: "{{ wordpress_project_root }}/plugins/{{ item | basename }}"
+    state: link
+  with_items: wordpress_local_plugins
+- name: Make uploads symlink
+  file:
+    path: "{{ wordpress_site_root }}/wp-content/uploads"
+    src: "{{ wordpress_project_root }}/uploads"
+    state: link
+- name: Is Wordpress configured?
+  stat: "path={{ wordpress_site_root }}/wp-config.php"
+  register: wpconfig_stat
+- name: Create wp-config.php
+  shell: "wp core config --dbname={{ wordpress_dbname }} --dbuser={{ wordpress_user }} --dbpass={{ wordpress_password }}"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  when: "not wpconfig_stat.stat.exists"
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Is Wordpress installed?
+  shell: "wp core is-installed"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  register: wordpress_is_installed
+  ignore_errors: yes
+  changed_when: no
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Copy SQL dump over
+  copy: "src={{ wordpress_base_name }}.sql.gz dest=/tmp/{{ wordpress_base_name }}.sql.gz"
+  when: wordpress_is_installed|failed
+- name: Import Wordpress dump
+  shell: "gunzip -dc /tmp/{{ wordpress_base_name }}.sql.gz | wp db import -"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  when: wordpress_is_installed|failed
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Get current siteurl
+  shell: wp option get siteurl
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  register: wordpress_siteurl_result
+  changed_when: no
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Change siteurl if needed
+  shell: "wp option set siteurl \"{{ wordpress_url }}\" && wp search-replace \"{{ wordpress_siteurl_result.stdout.strip() }}\" \"{{ wordpress_url }}\""
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  when: "wordpress_siteurl_result.stdout.strip() != wordpress_url"
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Install Wordpress public plugins
+  shell: "wp plugin install {{ item }}"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+    creates: "{{ wordpress_site_root }}/wp-content/plugins/{{ item }}"
+  become: yes
+  become_user: "{{ wordpress_user }}"
+  with_items: wordpress_plugins
+

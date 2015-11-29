@@ -1,0 +1,14 @@
+---
+- name: apt-get update/upgrade
+  apt: update_cache=yes upgrade=yes cache_valid_time=3600
+- name: Ensure packages needed for basic Wordpress provisioning are present
+  apt: name={{ item }} state=latest
+  with_items:
+    - rsync
+    - sudo
+- name: Ensure that wordpress_user exists
+  user:
+    name: "{{ wordpress_user }}"
+    createhome: no
+    shell: /bin/bash
+

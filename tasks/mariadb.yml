@@ -1,0 +1,24 @@
+---
+- name: Ensure packages needed for mariadb are present
+  apt: name={{ item }} state=latest
+  with_items:
+    - mariadb-server
+    - mariadb-client
+    - php5-mysqlnd
+    - python-mysqldb # for ansible to connect
+- name: Ensure that mariadb is started
+  service: name=mysql state=started # enabled=yes > always reports as changed, commented out
+- name: Set mariadb root password
+  mysql_user: "name=root password={{ mariadb_root_password }}"
+  when: setup_mariadb_root
+- name: Setup root client's root password
+  template: src=my.cnf dest=~/.my.cnf
+- name: Create mariadb DB for the Wordpress project
+  mysql_db: "name={{ wordpress_dbname }} state=present"
+- name: Create mariadb user for the Wordpress project
+  mysql_user: 
+    name: "{{ wordpress_user }}"
+    password: "{{ wordpress_password }}"
+    priv: "{{ wordpress_dbname }}.*:ALL"
+    state: present
+

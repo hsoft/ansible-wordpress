@@ -1,0 +1,17 @@
+---
+- name: Ensure sync target folder exists
+  file:
+    path: "{{ sync_base_target }}"
+    state: directory
+    owner: "{{ wordpress_user }}"
+    group: www-data
+    mode: "u=rwX,g=rX,o=" # X != x, remember
+- name: Sync local src
+  synchronize:
+    src: "{{ item }}"
+    dest: "{{ sync_base_target }}"
+    archive: no
+    recursive: yes
+    rsync_path: sudo rsync
+  with_items: sync_paths
+

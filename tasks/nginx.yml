@@ -1,0 +1,9 @@
+---
+- name: Ensure packages needed for nginx+php-fpm are present
+  apt: name={{ item }} state=latest
+  with_items:
+    - php5-fpm
+- name: Create config for wordpress site
+  template: "src=nginx.conf dest=/etc/nginx/sites-enabled/{{ wordpress_base_name }}.conf"
+  notify: nginx restart
+

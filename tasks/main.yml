@@ -1,0 +1,6 @@
+---
+- include: system.yml
+- include: mariadb.yml
+- include: nginx.yml
+- include: wordpress.yml
+
