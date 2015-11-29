@@ -3,8 +3,9 @@
 wordpress_base_name: my_wp_website
 # The user that will own all WP-related files
 wordpress_user: "{{ wordpress_base_name }}"
-# URL of the website
-wordpress_url: "http://{{ wordpress_base_name }}.local"
+# Domain name for the website
+wordpress_domain_name: "{{ wordpress_base_name }}.local"
+wordpress_url: "http://{{ wordpress_domain_name }}"
 # Project root. *not* the folder that will contain index.php
 wordpress_project_root: "/opt/{{ wordpress_base_name }}"
 # WP site root. This contains WP's source (index.php etc.)
@@ -25,4 +26,6 @@ mariadb_root_password: whatever
 wordpress_dbname: "{{ wordpress_base_name }}"
 wordpress_user: "{{ wordpress_base_name }}"
 wordpress_password: whatever
+wordpress_dbdump_path: "{{ wordpress_base_name }}.sql.gz"
+wordpress_uploads_archive_path: "{{ wordpress_base_name }}-uploads.tar.gz"
 

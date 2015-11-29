@@ -33,7 +33,7 @@
     mode: "ug=rwX,o=" # X != x, remember
 - name: Copy Wordpress uploads over
   unarchive:
-    src: uploads.tar.gz
+    src: "{{ wordpress_uploads_archive_path }}"
     dest: "{{ wordpress_project_root }}/uploads"
     creates: "{{ wordpress_project_root }}/uploads/2015"
     owner: "{{ wordpress_user }}"
@@ -84,7 +84,7 @@
   become: yes
   become_user: "{{ wordpress_user }}"
 - name: Copy SQL dump over
-  copy: "src={{ wordpress_base_name }}.sql.gz dest=/tmp/{{ wordpress_base_name }}.sql.gz"
+  copy: "src={{ wordpress_dbdump_path }} dest=/tmp/{{ wordpress_base_name }}.sql.gz"
   when: wordpress_is_installed|failed
 - name: Import Wordpress dump
   shell: "gunzip -dc /tmp/{{ wordpress_base_name }}.sql.gz | wp db import -"
