@@ -64,16 +64,7 @@
     path: "{{ wordpress_site_root }}/wp-content/uploads"
     src: "{{ wordpress_project_root }}/uploads"
     state: link
-- name: Is Wordpress configured?
-  stat: "path={{ wordpress_site_root }}/wp-config.php"
-  register: wpconfig_stat
-- name: Create wp-config.php
-  shell: "wp core config --dbname={{ wordpress_dbname }} --dbuser={{ wordpress_user }} --dbpass={{ wordpress_password }}"
-  args:
-    chdir: "{{ wordpress_site_root }}"
-  when: "not wpconfig_stat.stat.exists"
-  become: yes
-  become_user: "{{ wordpress_user }}"
+- include: wordpress_config.yml
 - include: wordpress_db.yml
 - name: Get current siteurl
   shell: wp option get siteurl
