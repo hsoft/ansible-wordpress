@@ -1,0 +1,31 @@
+---
+# Take care of importing, if needed, our DB dump into MariaDB.
+# Requires wp-cli installed
+- name: Is Wordpress installed?
+  shell: "wp core is-installed"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  register: wordpress_is_installed
+  ignore_errors: yes
+  when: not wordpress_force_db_import
+  changed_when: no
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Drop existing WP DB (because we forced it)
+  shell: "wp db reset --yes"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  when: wordpress_force_db_import and wordpress_is_installed|success
+  become: yes
+  become_user: "{{ wordpress_user }}"
+- name: Copy SQL dump over
+  copy: "src={{ wordpress_dbdump_path }} dest=/tmp/{{ wordpress_base_name }}.sql.gz"
+  when: wordpress_force_db_import or wordpress_is_installed|failed
+- name: Import Wordpress dump
+  shell: "gunzip -dc /tmp/{{ wordpress_base_name }}.sql.gz | wp db import -"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  when: wordpress_force_db_import or wordpress_is_installed|failed
+  become: yes
+  become_user: "{{ wordpress_user }}"
+
