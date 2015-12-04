@@ -32,4 +32,8 @@ wordpress_uploads_archive_path: "{{ wordpress_base_name }}-uploads.tar.gz"
 wordpress_force_db_import: no
 # Dictionary of extra wp-config define to add
 wordpress_extra_wpconfig: {}
+# Whether we enable SSL in nginx
+wordpress_ssl: no
+wordpress_ssl_cert_path: ""
+wordpress_ssl_key_path: ""
 
