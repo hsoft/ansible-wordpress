@@ -39,14 +39,7 @@
     owner: "{{ wordpress_user }}"
     group: www-data
     mode: "ug=rwX,o=" # X != x, remember
-- name: Is Wordpress downloaded?
-  stat: "path={{ wordpress_site_root }}"
-  register: wordpress_stat
-- name: Download wordpress
-  shell: "wp core download --path={{ wordpress_site_root }} --locale=fr_FR"
-  when: "not wordpress_stat.stat.exists"
-  become: yes
-  become_user: "{{ wordpress_user }}"
+- include: wordpress_core.yml
 - name: Make theme symlinks
   file:
     path: "{{ wordpress_site_root }}/wp-content/themes/{{ item | basename }}"
