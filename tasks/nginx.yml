@@ -1,9 +1,10 @@
 ---
-- name: Ensure packages needed for nginx+php-fpm are present
+- name: Ensure packages needed for WP running under nginx+php-fpm are present
   apt: name={{ item }} state=latest
   with_items:
     - nginx
     - php5-fpm
+    - php5-gd
 - name: Delete default site
   file: path=/etc/nginx/sites-enabled/default state=absent
   notify: nginx restart
