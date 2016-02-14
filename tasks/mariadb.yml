@@ -17,7 +17,7 @@
   mysql_db: "name={{ wordpress_dbname }} state=present"
 - name: Create mariadb user for the Wordpress project
   mysql_user: 
-    name: "{{ wordpress_user }}"
+    name: "{{ wordpress_dbuser }}"
     password: "{{ wordpress_password }}"
     priv: "{{ wordpress_dbname }}.*:ALL"
     state: present

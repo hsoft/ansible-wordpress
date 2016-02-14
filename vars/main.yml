@@ -26,7 +26,7 @@ wpcli_binpath: /usr/local/bin/wp
 setup_mariadb_root: yes
 mariadb_root_password: whatever
 wordpress_dbname: "{{ wordpress_base_name }}"
-wordpress_user: "{{ wordpress_base_name }}"
+wordpress_dbuser: "{{ wordpress_base_name }}"
 wordpress_password: whatever
 wordpress_dbdump_path: "{{ wordpress_base_name }}.sql.gz"
 wordpress_uploads_archive_path: "{{ wordpress_base_name }}-uploads.tar.gz"
