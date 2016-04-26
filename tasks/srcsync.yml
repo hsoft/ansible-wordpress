@@ -11,7 +11,7 @@
     recursive: yes
     checksum: yes
     rsync_path: sudo rsync
-  with_items: sync_paths
+  with_items: "{{ sync_paths }}"
 - name: Fix synced src's permissions
   file:
     path: "{{ sync_base_target }}"

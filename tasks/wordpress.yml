@@ -45,13 +45,13 @@
     path: "{{ wordpress_site_root }}/wp-content/themes/{{ item | basename }}"
     src: "{{ wordpress_project_root }}/themes/{{ item | basename }}"
     state: link
-  with_items: wordpress_local_themes
+  with_items: "{{ wordpress_local_themes }}"
 - name: Make local plugins symlinks
   file:
     path: "{{ wordpress_site_root }}/wp-content/plugins/{{ item | basename }}"
     src: "{{ wordpress_project_root }}/plugins/{{ item | basename }}"
     state: link
-  with_items: wordpress_local_plugins
+  with_items: "{{ wordpress_local_plugins }}"
 - name: Make uploads symlink
   file:
     path: "{{ wordpress_site_root }}/wp-content/uploads"
@@ -81,5 +81,5 @@
     creates: "{{ wordpress_site_root }}/wp-content/plugins/{{ item }}"
   become: yes
   become_user: "{{ wordpress_user }}"
-  with_items: wordpress_plugins
+  with_items: "{{ wordpress_plugins }}"
 
