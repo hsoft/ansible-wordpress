@@ -11,4 +11,6 @@
     name: "{{ wordpress_user }}"
     createhome: no
     shell: /bin/bash
+    # We need to be able to read-write uploads written by php-fpm
+    groups: www-data
 
