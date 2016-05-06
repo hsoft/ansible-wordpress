@@ -1,0 +1,18 @@
+---
+# Take care of importing, from backups, our DB and uploads, if needed (if our DB is currently empty)
+# Requires wp-cli installed
+- name: Is Wordpress installed?
+  shell: "wp core is-installed"
+  args:
+    chdir: "{{ wordpress_site_root }}"
+  register: wordpress_is_installed
+  failed_when: no
+  changed_when: no
+  become: yes
+  become_user: "{{ wordpress_user }}"
+
+- name: Run our restore script
+  shell: "{{ wordpress_project_root }}/restore.sh"
+  when: wordpress_is_installed|failed
+  become: yes
+  become_user: "{{ wordpress_user }}"

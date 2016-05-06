@@ -31,14 +31,19 @@
     owner: "{{ wordpress_user }}"
     group: www-data
     mode: "ug=rwX,o=" # X != x, remember
-- name: Copy Wordpress uploads over
-  unarchive:
-    src: "{{ wordpress_uploads_archive_path }}"
-    dest: "{{ wordpress_project_root }}/uploads"
-    creates: "{{ wordpress_project_root }}/uploads/2015"
-    owner: "{{ wordpress_user }}"
-    group: www-data
-    mode: "ug=rwX,o=" # X != x, remember
+
+- name: Ensure that we have dumpdb/restoredb scripts
+  template:
+    src: "{{ item }}.sh"
+    dest: "{{ wordpress_project_root }}/{{ item }}.sh"
+    mode: 0700
+  become: yes
+  become_user: "{{ wordpress_user }}"
+  with_items:
+    - dumpdb
+    - restoredb
+
+
 - include: wordpress_core.yml
 - name: Make theme symlinks
   file:
@@ -58,7 +63,7 @@
     src: "{{ wordpress_project_root }}/uploads"
     state: link
 - include: wordpress_config.yml
-- include: wordpress_db.yml
+- include: wordpress_restore_if_needed.yml
 - name: Get current siteurl
   shell: wp option get siteurl
   args:

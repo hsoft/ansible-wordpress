@@ -28,10 +28,6 @@ mariadb_root_password: whatever
 wordpress_dbname: "{{ wordpress_base_name }}"
 wordpress_dbuser: "{{ wordpress_base_name }}"
 wordpress_password: whatever
-wordpress_dbdump_path: "{{ wordpress_base_name }}.sql.gz"
-wordpress_uploads_archive_path: "{{ wordpress_base_name }}-uploads.tar.gz"
-# Force an import of the DB dump even if there's already a DB
-wordpress_force_db_import: no
 # Dictionary of extra wp-config define to add
 wordpress_extra_wpconfig: {}
 
