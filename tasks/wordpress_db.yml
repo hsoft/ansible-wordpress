@@ -32,9 +32,12 @@
 # The presence of this script facilitate backup config
 - name: Ensure that we have a dumpdb.sh script
   template:
-    src: dump.sh
-    dest: "{{ wordpress_project_root }}/dumpdb.sh"
+    src: "{{ item }}.sh"
+    dest: "{{ wordpress_project_root }}/{{ item }}.sh"
     mode: 0700
   become: yes
   become_user: "{{ wordpress_user }}"
+  with_items:
+    - dumpdb
+    - restoredb
 

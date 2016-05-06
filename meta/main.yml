@@ -5,8 +5,6 @@ dependencies:
     zbackup_owner: "{{ wordpress_user }}"
   - role: backup-cron
     backup_cron_user: "{{ wordpress_user }}"
-    backup_cron_script_path: "{{ wordpress_project_root }}/backup.sh"
-    backup_cron_storage_script_path: "{{ wordpress_project_root }}/backups/dump"
-    backup_cron_dumpscript: "{{ wordpress_project_root }}/dumpdb.sh"
+    backup_cron_base_path: "{{ wordpress_project_root }}"
     backup_cron_folders:
       - "{{ wordpress_project_root }}/uploads"
