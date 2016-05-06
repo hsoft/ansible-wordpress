@@ -30,10 +30,10 @@
   become_user: "{{ wordpress_user }}"
 
 # The presence of this script facilitate backup config
-- name: Ensure that we have a dump.sh script
+- name: Ensure that we have a dumpdb.sh script
   template:
     src: dump.sh
-    dest: "{{ wordpress_project_root }}/dump.sh"
+    dest: "{{ wordpress_project_root }}/dumpdb.sh"
     mode: 0700
   become: yes
   become_user: "{{ wordpress_user }}"
