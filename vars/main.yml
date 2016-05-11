@@ -22,9 +22,6 @@ wordpress_local_plugins: []
 wpcli_url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 # wp-cli destination (is chmodded +x)
 wpcli_binpath: /usr/local/bin/wp
-# Whether we set up a root user for mariadb. Set to no if you take care of this elsewhere.
-setup_mariadb_root: yes
-mariadb_root_password: whatever
 wordpress_dbname: "{{ wordpress_base_name }}"
 wordpress_dbuser: "{{ wordpress_base_name }}"
 wordpress_password: whatever
