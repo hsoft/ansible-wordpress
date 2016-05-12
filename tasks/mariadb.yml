@@ -12,4 +12,5 @@
     password: "{{ wordpress_password }}"
     priv: "{{ wordpress_dbname }}.*:ALL"
     state: present
+  register: mariadb_user_result
 

@@ -1,4 +1,10 @@
 ---
+- name: Remove config if we changed mariadb's password
+  file:
+    path: "{{ wordpress_site_root }}/wp-config.php"
+    state: absent
+  when: mariadb_user_result|changed
+
 - name: Is Wordpress configured?
   stat: "path={{ wordpress_site_root }}/wp-config.php"
   register: wpconfig_stat
