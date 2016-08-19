@@ -1,18 +1,10 @@
----
-# Take care of importing, from backups, our DB and uploads, if needed (if our DB is currently empty)
-# Requires wp-cli installed
-- name: Is Wordpress installed?
-  shell: "wp core is-installed"
-  args:
-    chdir: "{{ wordpress_site_root }}"
-  register: wordpress_is_installed
-  failed_when: no
-  changed_when: no
-  become: yes
-  become_user: "{{ wordpress_user }}"
-
+# we used to use "wp core is-installed" to determine if we should launch this, but sometimes, due
+# to bugs, wpcli would falsely fail on this command and mistakenly launch the restore procedure,
+# which is very bad because this procedure is destructive in terms of persistent data.
+# That's why we use mariadb_create_db_result|changed instead. More easy to have false negatives,
+# but it's false positive that we really worry about...
 - name: Run our restore script
   shell: "{{ wordpress_project_root }}/restore.sh"
-  when: wordpress_is_installed|failed
+  when: mariadb_create_db_result|changed
   become: yes
   become_user: "{{ wordpress_user }}"

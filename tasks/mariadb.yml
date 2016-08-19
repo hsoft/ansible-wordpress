@@ -1,11 +1,17 @@
----
 - name: Ensure packages needed for mariadb are present
-  apt: name={{ item }} state=present
+  apt:
+    name: "{{ item }}"
+    state: present
   with_items:
     - mariadb-client
     - php5-mysqlnd
+
 - name: Create mariadb DB for the Wordpress project
-  mysql_db: "name={{ wordpress_dbname }} state=present"
+  mysql_db:
+    name: "{{ wordpress_dbname }}"
+    state: present
+  register: mariadb_create_db_result
+
 - name: Create mariadb user for the Wordpress project
   mysql_user: 
     name: "{{ wordpress_dbuser }}"
