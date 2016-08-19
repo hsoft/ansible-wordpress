@@ -1,12 +1,3 @@
----
-- name: Ensure that wp-cli is installed
-  get_url: "url={{ wpcli_url }} dest={{ wpcli_binpath }}"
-  register: wpcli_download
-- name: Ensure that wp-cli bin has proper permissions
-  file:
-    path: "{{ wpcli_binpath }}"
-    mode: "0755"
-  when: wpcli_download|changed
 - name: Ensure that Wordpress' project dir exists
   file:
     path: "{{ wordpress_project_root }}"
@@ -14,6 +5,7 @@
     owner: "{{ wordpress_user }}"
     group: www-data
     mode: "2750" # leading 2 = setguid for the folder to propagate www-data group
+
 - name: Sync local themes
   include: srcsync.yml
   vars:

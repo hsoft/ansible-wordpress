@@ -1,0 +1,12 @@
+- name: Ensure that wp-cli is installed
+  get_url: "url={{ wpcli_url }} dest={{ wpcli_binpath }}"
+  register: wpcli_download
+
+- name: Ensure that wp-cli bin has proper permissions
+  file:
+    path: "{{ wpcli_binpath }}"
+    mode: "0755"
+  when: wpcli_download|changed
+
+- name: Ensure that wpcli is up to date
+  command: "{{ wpcli_binpath }} --allow-root cli update"
