@@ -1,4 +1,3 @@
----
 # A slug uniquely identifying the WP project name
 wordpress_base_name: my_wp_website
 # The user that will own all WP-related files
@@ -11,7 +10,7 @@ wordpress_project_root: "/opt/{{ wordpress_base_name }}"
 # WP site root. This contains WP's source (index.php etc.)
 wordpress_site_root: "{{ wordpress_project_root }}/wordpress"
 # The version of WP core to install or update to
-wordpress_core_version: "4.4"
+wordpress_core_version: "4.6.1"
 # Plugins to install from WP's public plugin listing. A list of slugs (Example: "image-widget")
 wordpress_plugins: []
 # A list of local paths to themes which will be installed in our site.
