@@ -24,18 +24,6 @@
     group: www-data
     mode: "ug=rwX,o=" # X != x, remember
 
-- name: Ensure that we have dumpdb/restoredb scripts
-  template:
-    src: "{{ item }}.sh"
-    dest: "{{ wordpress_project_root }}/{{ item }}.sh"
-    mode: 0700
-  become: yes
-  become_user: "{{ wordpress_user }}"
-  with_items:
-    - dumpdb
-    - restoredb
-
-
 - include: wordpress_core.yml
 - name: Make theme symlinks
   file:
@@ -55,7 +43,27 @@
     src: "{{ wordpress_project_root }}/uploads"
     state: link
 - include: wordpress_config.yml
-- include: wordpress_restore_if_needed.yml
+
+- name: Is our Wordpress DB already installed?
+  command: "wp --path={{ wordpress_site_root }} core is-installed"
+  register: wordpress_is_installed
+  failed_when: no
+  become: yes
+  become_user: "{{ wordpress_user }}"
+
+- name: wp core install
+  command: >
+    wp --path={{ wordpress_site_root }} core install
+    --url={{ wordpress_url }}
+    --title="{{ wordpress_site_title }}"
+    --admin_user={{ wordpress_site_admin_username }}
+    --admin_password="{{ wordpress_site_admin_password }}"
+    --admin_email={{ wordpress_site_admin_email }}
+    --skip-email
+  when: wordpress_is_installed.rc != 0
+  become: yes
+  become_user: "{{ wordpress_user }}"
+
 - name: Get current siteurl
   shell: wp option get siteurl
   args:
