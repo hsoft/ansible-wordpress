@@ -1,22 +1,14 @@
 ---
 - name: Ensure packages needed for WP running under nginx+php-fpm are present
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items:
-    - nginx
-    - php5-fpm
     - php5-gd
     - php5-imagick
     - ssl-cert # needed for snakeoil nginx config
-- name: Delete default site
-  file: path=/etc/nginx/sites-enabled/default state=absent
-  notify: nginx restart
-- name: Check if SSL config is there
-  stat: path="/etc/nginx/snippets/{{ wordpress_domain_name }}.ssl.conf"
-  register: ssl_config_file
-- name: Check if acme_well_known config is there
-  stat: path="/etc/nginx/snippets/acme_well_known.conf"
-  register: acme_well_known_config_file
+
 - name: Create config for wordpress site
-  template: "src=nginx.conf dest=/etc/nginx/sites-enabled/{{ wordpress_base_name }}.conf"
+  template:
+    src: nginx.conf
+    dest: "/etc/nginx/snippets/php-fpm-{{ wordpress_base_name }}.wordpress.conf"
   notify: nginx restart
 
