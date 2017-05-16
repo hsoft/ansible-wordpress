@@ -16,7 +16,7 @@ wordpress_project_root: "/opt/{{ wordpress_base_name }}"
 wordpress_site_root: "{{ wordpress_project_root }}/wordpress"
 
 # The version of WP core to install or update to
-wordpress_core_version: "4.7.2"
+wordpress_core_version: "4.7.4"
 
 # Plugins to install from WP's public plugin listing. A list of slugs (Example: "image-widget")
 wordpress_plugins: []
