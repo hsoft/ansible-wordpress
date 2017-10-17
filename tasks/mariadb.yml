@@ -4,7 +4,7 @@
     state: present
   with_items:
     - mariadb-client
-    - php5-mysqlnd
+    - php-mysqlnd
 
 - name: Create mariadb DB for the Wordpress project
   mysql_db:

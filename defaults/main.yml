@@ -12,11 +12,11 @@ wordpress_url: "http://{{ wordpress_domain_name }}"
 # Project root. *not* the folder that will contain index.php
 wordpress_project_root: "/opt/{{ wordpress_base_name }}"
 
-# WP site root. This contains WP's source (index.php etc.)
-wordpress_site_root: "{{ wordpress_project_root }}/wordpress"
+# Path of the wp-content folder that will be served
+wordpress_content_root: "{{ wordpress_project_root }}/wp-content"
 
-# The version of WP core to install or update to
-wordpress_core_version: "4.8.2"
+# WP site root. This contains WP's source (index.php etc.)
+wordpress_site_root: "/usr/share/wordpress"
 
 # Plugins to install from WP's public plugin listing. A list of slugs (Example: "image-widget")
 wordpress_plugins: []
@@ -33,6 +33,8 @@ wpcli_url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.
 # wp-cli destination (is chmodded +x)
 wpcli_binpath: /usr/local/bin/wp
 
+wpcli_args: "--path=/usr/share/wordpress --url=\"{{ wordpress_domain_name }}\""
+
 # DB parameters
 wordpress_dbname: "{{ wordpress_base_name }}"
 wordpress_dbuser: "{{ wordpress_base_name }}"
@@ -40,9 +42,3 @@ wordpress_password: whatever
 
 # Dictionary of extra wp-config define to add
 wordpress_extra_wpconfig: {}
-
-# These parameters below are only used when creating a new website
-wordpress_site_title: Wordpress
-wordpress_site_admin_username: admin
-wordpress_site_admin_password: change-this-very-quickly-please
-wordpress_site_admin_email: admin@example.com

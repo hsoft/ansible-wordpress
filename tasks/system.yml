@@ -6,8 +6,8 @@
   apt: name={{ item }} state=present
   with_items:
     - rsync
-    - sudo
-    - php5-cli
+    - php-cli
+    - wordpress
 
 - name: Ensure that wordpress_user exists
   user:

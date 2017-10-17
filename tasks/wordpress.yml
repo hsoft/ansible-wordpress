@@ -1,90 +1,50 @@
-- name: Ensure that Wordpress' project dir exists
+- name: Ensure that Wordpress' important dirs exist
   file:
-    path: "{{ wordpress_project_root }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ wordpress_user }}"
     group: www-data
     mode: "2750" # leading 2 = setguid for the folder to propagate www-data group
+  with_items:
+    - "{{ wordpress_project_root }}"
+    - "{{ wordpress_content_root }}"
+    - "{{ wordpress_content_root }}/uploads"
 
 - name: Sync local themes
   include: srcsync.yml
   vars:
-    sync_base_target: "{{ wordpress_project_root }}/themes"
+    sync_base_target: "{{ wordpress_content_root }}/themes"
     sync_paths: "{{ wordpress_local_themes }}"
+
 - name: Sync local plugins
   include: srcsync.yml
   vars:
-    sync_base_target: "{{ wordpress_project_root }}/plugins"
+    sync_base_target: "{{ wordpress_content_root }}/plugins"
     sync_paths: "{{ wordpress_local_plugins }}"
-- name: Ensure that Wordpress uploads folder exists
-  file:
-    path: "{{ wordpress_project_root }}/uploads"
-    state: directory
-    owner: "{{ wordpress_user }}"
-    group: www-data
-    mode: "ug=rwX,o=" # X != x, remember
 
-- include: wordpress_core.yml
-- name: Make theme symlinks
-  file:
-    path: "{{ wordpress_site_root }}/wp-content/themes/{{ item | basename }}"
-    src: "{{ wordpress_project_root }}/themes/{{ item | basename }}"
-    state: link
-  with_items: "{{ wordpress_local_themes }}"
-- name: Make local plugins symlinks
-  file:
-    path: "{{ wordpress_site_root }}/wp-content/plugins/{{ item | basename }}"
-    src: "{{ wordpress_project_root }}/plugins/{{ item | basename }}"
-    state: link
-  with_items: "{{ wordpress_local_plugins }}"
-- name: Make uploads symlink
-  file:
-    path: "{{ wordpress_site_root }}/wp-content/uploads"
-    src: "{{ wordpress_project_root }}/uploads"
-    state: link
 - include: wordpress_config.yml
 
-- name: Is our Wordpress DB already installed?
-  command: "wp --path={{ wordpress_site_root }} core is-installed"
-  register: wordpress_is_installed
-  failed_when: no
-  become: yes
-  become_user: "{{ wordpress_user }}"
-
-- name: wp core install
-  command: >
-    wp --path={{ wordpress_site_root }} core install
-    --url={{ wordpress_url }}
-    --title="{{ wordpress_site_title }}"
-    --admin_user={{ wordpress_site_admin_username }}
-    --admin_password="{{ wordpress_site_admin_password }}"
-    --admin_email={{ wordpress_site_admin_email }}
-    --skip-email
-  when: wordpress_is_installed.rc != 0
-  become: yes
-  become_user: "{{ wordpress_user }}"
-
 - name: Get current siteurl
-  shell: wp option get siteurl
-  args:
-    chdir: "{{ wordpress_site_root }}"
+  shell: "wp {{ wpcli_args }} option get siteurl"
   register: wordpress_siteurl_result
+  ignore_errors: yes
   changed_when: no
   become: yes
   become_user: "{{ wordpress_user }}"
+
 - name: Change siteurl if needed
-  shell: "wp option set siteurl \"{{ wordpress_url }}\" && wp search-replace \"{{ wordpress_siteurl_result.stdout.strip() }}\" \"{{ wordpress_url }}\""
-  args:
-    chdir: "{{ wordpress_site_root }}"
+  shell: "wp {{ wpcli_args }} option set siteurl \"{{ wordpress_url }}\" && wp search-replace \"{{ wordpress_siteurl_result.stdout.strip() }}\" \"{{ wordpress_url }}\""
+  ignore_errors: yes
   when: "wordpress_siteurl_result.stdout.strip() != wordpress_url"
   become: yes
   become_user: "{{ wordpress_user }}"
+
 - name: Install Wordpress public plugins
-  shell: "wp plugin install {{ item }}"
+  shell: "wp {{ wpcli_args }} plugin install {{ item }}"
   args:
-    chdir: "{{ wordpress_site_root }}"
-    creates: "{{ wordpress_site_root }}/wp-content/plugins/{{ item }}"
+    creates: "{{ wordpress_content_root }}/plugins/{{ item }}"
+  ignore_errors: yes
+  with_items: "{{ wordpress_plugins }}"
   become: yes
   become_user: "{{ wordpress_user }}"
-  with_items: "{{ wordpress_plugins }}"
 
