@@ -10,6 +10,12 @@
     - "{{ wordpress_content_root }}"
     - "{{ wordpress_content_root }}/uploads"
 
+- name: symlink the languages dir from the system's wordpress
+  file:
+    path: "{{ wordpress_content_root }}/languages"
+    state: link
+    src: /usr/share/wordpress/wp-content/languages
+
 - name: Sync local themes
   include: srcsync.yml
   vars:
