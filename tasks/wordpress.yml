@@ -17,18 +17,18 @@
     src: /usr/share/wordpress/wp-content/languages
 
 - name: Sync local themes
-  include: srcsync.yml
+  include_tasks: srcsync.yml
   vars:
     sync_base_target: "{{ wordpress_content_root }}/themes"
     sync_paths: "{{ wordpress_local_themes }}"
 
 - name: Sync local plugins
-  include: srcsync.yml
+  include_tasks: srcsync.yml
   vars:
     sync_base_target: "{{ wordpress_content_root }}/plugins"
     sync_paths: "{{ wordpress_local_plugins }}"
 
-- include: wordpress_config.yml
+- import_tasks: wordpress_config.yml
 
 - name: Get current siteurl
   shell: "wp {{ wpcli_args }} option get siteurl"
